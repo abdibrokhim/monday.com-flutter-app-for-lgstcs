@@ -1,0 +1,42 @@
+Form "Inspection" (2 sections)
+
+
+1 section - Main
+
+Driver Name  - text
+Truck VIN - text
+Trailer number -  text
+Date Check In (optional)
+Date Check Out (optional)
+Mileage In for the truck - number
+Mileage Out for the truck - number
+DEF for the truck - options to choose: E 1/4 1/2 3/4 F
+FUEL for the truck - options to choose: E 1/8 1/4 3/8 1/2 5/8 3/4 7/8 F
+Truck's front side (image)
+Truck's left side (image)
+Truck's right side (image)
+Truck's back side (image)
+Left Front Tire (image)
+Right Front Tire (Image)
+Side Left Tires (image)
+Side Right Tires (image)
+Left Rear Outside (Image)
+Left Rear Inside (Image)
+Right Rear Outside (Image)
+Right Rear Inside (Image)
+Trailer's  left side (image)
+Trailer's right side (image)
+Any additional photos
+
+
+2 section - Equipments
+
+Bestpass image 
+Tablet image 
+Chains yes/no and if yes, how many bags 
+Inverter yes/no 
+Straps - yes/no and if yes, how many straps
+ELD device with cable image
+GPS for truck yes/no
+GPS for trailer yes/no
+Fridge yes/no
