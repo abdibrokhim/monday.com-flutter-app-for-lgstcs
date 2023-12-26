@@ -10,7 +10,7 @@
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
 
     <application
-        android:label="Wechat Assets Picker Example"
+        android:label="Truck ReportMe"
         android:icon="@mipmap/ic_launcher"
         android:allowBackup="false">
         <activity

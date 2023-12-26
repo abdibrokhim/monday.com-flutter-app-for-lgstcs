@@ -48,6 +48,7 @@ class PickMethod {
             maxAssets: maxAssetsCount,
             selectedAssets: assets,
             requestType: RequestType.image,
+            textDelegate: const EnglishAssetPickerTextDelegate() 
           ),
         );
       },
@@ -104,6 +105,7 @@ class PickMethod {
         return AssetPicker.pickAssets(
           context,
           pickerConfig: AssetPickerConfig(
+            textDelegate: const EnglishAssetPickerTextDelegate() ,
             maxAssets: maxAssetsCount,
             selectedAssets: assets,
             specialItemPosition: SpecialItemPosition.prepend,
