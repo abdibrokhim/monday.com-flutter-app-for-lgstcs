@@ -39,6 +39,7 @@ class _MyPageState extends State<MyPage>
   final TextEditingController _chainsController = TextEditingController();
   final TextEditingController _scrapsController = TextEditingController();
   String? mileageOut;
+  int? _selectedItemName;
   int? _selectedDefLevel;
   int? _selectedFuelLevel;
   int? _invertor;
@@ -81,7 +82,7 @@ class _MyPageState extends State<MyPage>
 
 
   List<AssetEntity> assets = <AssetEntity>[];
-  int maxAssetsCount = 1;
+  int maxAssetsCount = 4;
 
 
   late DefaultAssetPickerProvider keepScrollProvider =
@@ -286,16 +287,7 @@ class _MyPageState extends State<MyPage>
     Column(
       children: <Widget>[
         const Divider(height: 1.0),
-        Padding(padding: const EdgeInsets.only(left:16.0, right:16.0),
-                    child: 
-                                TextField(
-                          controller: itemNameController,
-                          decoration: const InputDecoration(
-                            labelText: "Item Name",
-                          ),
-                          // controller: Your board ID controller
-                        ),
-                        ),
+                        buildItemNameDropdown(),
         const SizedBox(height: 20),
         CustomDropdownWithSearch(
           items: mainFormState.driverNamesList!,
@@ -304,13 +296,13 @@ class _MyPageState extends State<MyPage>
         ),
         const SizedBox(height: 20),
         CustomDropdownWithSearch(
-          items: mainFormState.vinsList!,
+          items: mainFormState.trailerNumberList!,
           itemName: 'Truck VIN',
           dState: 1
         ),
         const SizedBox(height: 20),
         CustomDropdownWithSearch(
-          items: mainFormState.trailerNumberList!,
+          items: mainFormState.vinsList!,
           itemName: 'Trailer Number',
           dState: 2
         ),
@@ -958,25 +950,14 @@ class _MyPageState extends State<MyPage>
 
 
           const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Expanded(child: 
+               
                     ElevatedButton(
                       onPressed: () => _selectCheckInDate(context),
-                      child: Text(_checkInDate == null ? 'Select Check-In Date' : 'Check-In: ${_formatDate(_checkInDate!)}'),
+                      child: Text(_checkInDate == null ? 'Select Date' : 'Date: ${_formatDate(_checkInDate!)}'),
                     ),
-                    ),
-                    const SizedBox(width: 20),
-                    Expanded(child: 
-                    ElevatedButton(
-                      onPressed: () => _selectCheckOutDate(context),
-                      child: Text(_checkOutDate == null ? 'Select Check-Out Date' : 'Check-Out: ${_formatDate(_checkOutDate!)}'),
-                    ),
-                    ),
-                  ],
-                ),
                 const SizedBox(height: 20),
+                
+                const Divider(height: 1.0),
 
                 const SizedBox(height: 30),
               Row(
@@ -1023,14 +1004,6 @@ class _MyPageState extends State<MyPage>
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         _formKey.currentState!.save();
-                        if (_checkInDate == null) {
-                          store.dispatch(HandleGenericErrorAction('Check-In Date is required'));
-                          return;
-                        }
-                        if (_checkOutDate == null) {
-                          store.dispatch(HandleGenericErrorAction('Check-Out Date is required'));
-                          return;
-                        }
                         AppLog.log().i('Form is valid');
                         AppLog.log().i('Form Info start');
 
@@ -1054,7 +1027,7 @@ class _MyPageState extends State<MyPage>
 
                         store.dispatch(SubmitMainFormAction(
                           mainFormModel: MainFormModel(
-                            itemName: itemNameController.text,
+                            itemName: mainFormState.mainFormModel!.itemName,
                             driverName: mainFormState.mainFormModel!.driverName,
                             truckVin: mainFormState.mainFormModel!.truckVin,
                             trailerNumber: mainFormState.mainFormModel!.trailerNumber,
@@ -1089,6 +1062,8 @@ class _MyPageState extends State<MyPage>
                             eldDeviceWithCable: mainFormState.mainFormModel!.eldDeviceWithCable,
                           )
                         ));
+
+                        store.dispatch(GenerateReportAction(mainFormModel: mainFormState.mainFormModel!));
                       }
                     },
                     child:
@@ -1109,8 +1084,7 @@ class _MyPageState extends State<MyPage>
                       children: [
 
                     Text('If see this message. You\'ve successfully submitted the Main Form.'),
-                    Text('Now, you can generate and submit the Report Form.'),
-                    Text('Make sure you have not CLEARED the Main Form.'),
+                    Text('Now, you can Submit the Report Form.'),
                       ],
                     ),
                     ),
@@ -1119,36 +1093,23 @@ class _MyPageState extends State<MyPage>
 
                       const Divider(height: 1.0),
                     const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                        onPressed: () {
-                          if (mainFormState.mainFormModel != null) {
-                            store.dispatch(GenerateReportAction(mainFormModel: mainFormState.mainFormModel!));
-                          } else {
-                            store.dispatch(HandleGenericErrorAction('It seems you have cleared the form. Please fill the form again!'));
-                          }
-                        },
-                        child: const Text('Generate Report')
-                      ),
+            
                   ElevatedButton(
                         onPressed: () {
                           if (mainFormState.reportFile != null && mainFormState.itemId != null) {
                               store.dispatch(SubmitReportAction(reportForm: ReportForm(reportFile: mainFormState.reportFile, itemId: mainFormState.itemId, columnId: Environments.reportColumnId)));
                           } else {
-                            store.dispatch(HandleGenericErrorAction('Please generate the report first! Or try to RESUBMIT the Main Form!'));
+                            store.dispatch(HandleGenericErrorAction('An error occured. Please Try to RESUBMIT the Main Form!'));
                           }
                         },
 
                         child: const Text('Submit Report')
                       ),
-                ],),
                   ],
                 ),
-                                    const Divider(height: 1.0),
                                     const SizedBox(height: 20),
                                     const Divider(height: 1.0),
+                                    const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -1213,6 +1174,40 @@ class _MyPageState extends State<MyPage>
     );
   }
   
+  DropdownButtonFormField<int> buildItemNameDropdown() {
+    var state = StoreProvider.of<GlobalState>(context);
+    return DropdownButtonFormField<int>(
+      value: _selectedItemName,
+      onChanged: (int? newValue) {
+        if (newValue != null) {
+          store.dispatch(UpdateItemName(newValue));
+          state.dispatch(ClearGenericErrorAction(1));
+          print('_selectedItemName: ${store.state.appState.mainFormState.mainFormModel!.itemName}');
+          setState(() {
+            _selectedItemName = newValue;
+            itemNameController.text = itemNameOptions[newValue]!;
+          });
+        }
+      },
+      validator: (value) {
+        if (value == null) {
+          state.dispatch(HandleGenericErrorAction('Item Name is required'));
+          return "";
+        }
+        return null;
+      },
+      items: itemNameOptions.map((key, value) => MapEntry(
+        key, DropdownMenuItem<int>(
+          value: key,
+          child: Text(value),
+        )
+      )).values.toList(),
+      decoration: inputDecoration(
+        hintText: 'Select Item Name',
+        context: context,
+      ),
+    );
+  }
 
   Future<void> _selectCheckInDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -1225,21 +1220,6 @@ class _MyPageState extends State<MyPage>
       store.dispatch(UpdateDateCheckIn(picked));
       setState(() {
         _checkInDate = picked;
-      });
-    }
-  }
-
-  Future<void> _selectCheckOutDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: _checkOutDate ?? DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2025),
-    );
-    if (picked != null && picked != _checkOutDate) {
-      store.dispatch(UpdateDateCheckOut(picked));
-      setState(() {
-        _checkOutDate = picked;
       });
     }
   }
@@ -1360,13 +1340,13 @@ class _MyPageState extends State<MyPage>
       },
       validator: (value) {
         if (value!.isEmpty) {
-          state.dispatch(HandleGenericErrorAction('Scraps is required'));
+          state.dispatch(HandleGenericErrorAction('Straps is required'));
           return "";
         }
         return null;
       },
       decoration: inputDecoration(
-        hintText: 'Scraps', 
+        hintText: 'Straps', 
         context:context
       )
     );
@@ -1375,16 +1355,26 @@ class _MyPageState extends State<MyPage>
 
 
   DropdownButtonFormField<int> buildDefLevelDropdown() {
+    var state = StoreProvider.of<GlobalState>(context);
     return DropdownButtonFormField<int>(
       value: _selectedDefLevel,
       onChanged: (int? newValue) {
         if (newValue != null) {
           store.dispatch(UpdateDefLevelMap(newValue));
+          state.dispatch(ClearGenericErrorAction(6));
           print('_selectedDefLevel: ${store.state.appState.mainFormState.mainFormModel!.defLevel}');
           setState(() {
             _selectedDefLevel = newValue;
           });
         }
+      },
+      validator: (value) {
+        if (value == null) {
+          print('DEF Level: $value');
+          state.dispatch(HandleGenericErrorAction('DEF Level is required'));
+          return "";
+        }
+        return null;
       },
       items: defLevelMap.entries.map<DropdownMenuItem<int>>((entry) {
         return DropdownMenuItem<int>(
@@ -1400,16 +1390,26 @@ class _MyPageState extends State<MyPage>
   }
 
   DropdownButtonFormField<int> buildFuelLevelDropdown() {
+    var state = StoreProvider.of<GlobalState>(context);
     return DropdownButtonFormField<int>(
       value: _selectedFuelLevel,
       onChanged: (int? newValue) {
         if (newValue != null) {
           store.dispatch(UpdateFuelLevelMap(newValue));
+          state.dispatch(ClearGenericErrorAction(7));
           print('_selectedFuelLevel: ${store.state.appState.mainFormState.mainFormModel!.fuelLevel}');
           setState(() {
             _selectedFuelLevel = newValue;
           });
         }
+      },
+      validator: (value) {
+        if (value == null) {
+          print('Fuel Level: $value');
+          state.dispatch(HandleGenericErrorAction('Fuel Level is required'));
+          return "";
+        }
+        return null;
       },
       items: fuelLevelMap.map((key, value) => MapEntry(
         key, DropdownMenuItem<int>(
@@ -1425,16 +1425,26 @@ class _MyPageState extends State<MyPage>
   }
 
   DropdownButtonFormField<int> buildInvertorDropdown() {
+    var state = StoreProvider.of<GlobalState>(context);
     return DropdownButtonFormField<int>(
       value: _invertor,
       onChanged: (int? newValue) {
         if (newValue != null) {
           store.dispatch(UpdateInverter(newValue));
+          state.dispatch(ClearGenericErrorAction(8));
           print('invertor: ${store.state.appState.mainFormState.mainFormModel!.inverter}');
           setState(() {
             _invertor = newValue;
           });
         }
+      },
+      validator: (value) {
+        if (value == null) {
+          print('Invertor: $value');
+          state.dispatch(HandleGenericErrorAction('Invertor is required'));
+          return "";
+        }
+        return null;
       },
       items: options.map((key, value) => MapEntry(
         key, DropdownMenuItem<int>(
@@ -1450,16 +1460,26 @@ class _MyPageState extends State<MyPage>
   }
 
   DropdownButtonFormField<int> buildGpsForTruckDropdown() {
+    var state = StoreProvider.of<GlobalState>(context);
     return DropdownButtonFormField<int>(
       value: _gpsForTruck,
       onChanged: (int? newValue) {
         if (newValue != null) {
           store.dispatch(UpdateGpsForTruck(newValue));
+          state.dispatch(ClearGenericErrorAction(9));
           print('GPS For Truck: ${store.state.appState.mainFormState.mainFormModel!.gpsForTruck}');
           setState(() {
             _gpsForTruck = newValue;
           });
         }
+      },
+      validator: (value) {
+        if (value == null) {
+          print('GPS For Truck: $value');
+          state.dispatch(HandleGenericErrorAction('GPS For Truck is required'));
+          return "";
+        }
+        return null;
       },
       items: options.map((key, value) => MapEntry(
         key, DropdownMenuItem<int>(
@@ -1475,16 +1495,26 @@ class _MyPageState extends State<MyPage>
   }
 
   DropdownButtonFormField<int> buildGpsForTrailerDropdown() {
+    var state = StoreProvider.of<GlobalState>(context);
     return DropdownButtonFormField<int>(
       value: _gpsForTrailer,
       onChanged: (int? newValue) {
         if (newValue != null) {
           store.dispatch(UpdateGpsForTrailer(newValue));
+          state.dispatch(ClearGenericErrorAction(10));
           print('GPS For Trailer: ${store.state.appState.mainFormState.mainFormModel!.gpsForTrailer}');
           setState(() {
             _gpsForTrailer = newValue;
           });
         }
+      },
+      validator: (value) {
+        if (value == null) {
+          print('GPS For Trailer: $value');
+          state.dispatch(HandleGenericErrorAction('GPS For Trailer is required'));
+          return "";
+        }
+        return null;
       },
       items: options.map((key, value) => MapEntry(
         key, DropdownMenuItem<int>(
@@ -1500,16 +1530,26 @@ class _MyPageState extends State<MyPage>
   }
 
   DropdownButtonFormField<int> buildFridgeDropdown() {
+    var state = StoreProvider.of<GlobalState>(context);
     return DropdownButtonFormField<int>(
       value: _fridge,
       onChanged: (int? newValue) {
         if (newValue != null) {
           store.dispatch(UpdateFridge(newValue));
+          state.dispatch(ClearGenericErrorAction(11));
           print('Fridge: ${store.state.appState.mainFormState.mainFormModel!.fridge}');
           setState(() {
             _fridge = newValue;
           });
         }
+      },
+      validator: (value) {
+        if (value == null) {
+          print('Fridge: $value');
+          state.dispatch(HandleGenericErrorAction('Fridge is required'));
+          return "";
+        }
+        return null;
       },
       items: options.map((key, value) => MapEntry(
         key, DropdownMenuItem<int>(

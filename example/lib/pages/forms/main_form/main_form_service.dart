@@ -40,7 +40,7 @@ class MainFormService {
 
       print('Creating item...');
 
-      String itemName = mainFormModel.itemName;
+      String itemName = itemNameOptions[mainFormModel.itemName]!;
       String driverName = mainFormModel.driverName;
       String truckVin = mainFormModel.truckVin;
       String trailerNumber = mainFormModel.trailerNumber;
@@ -54,15 +54,14 @@ class MainFormService {
       String fridge = options[mainFormModel.fridge]!;
       int defLevel = mainFormModel.defLevel!+1;
       int fuelLevel = mainFormModel.fuelLevel!+1;
-      String dateCheckIn = mainFormModel.dateCheckIn!.toIso8601String().substring(0, 10);
-      String dateCheckOut = mainFormModel.dateCheckOut!.toIso8601String().substring(0, 10);
+      String dateCheckIn = mainFormModel.dateCheckIn != null ? mainFormModel.dateCheckIn!.toIso8601String().substring(0, 10) : '';
 
       var headers = {
         'Authorization': 'Bearer $mondayDotComApiKey',
         'Content-Type': 'application/json'
       };
       var request = http.Request('POST', Uri.parse(backendServiceBaseUrl));
-      request.body = '''{"query":"mutation (\$columnValuesJson: JSON!) {\\n  create_item(\\n    board_id: $myBoard\\n    group_id: \\"topics\\"\\n    item_name: \\"$itemName\\"\\n    column_values: \$columnValuesJson\\n  ) {\\n    id\\n  }\\n}","variables":{"columnValuesJson":"{\\"driver_name\\":\\"$driverName\\",\\"truck_vin\\":\\"$truckVin\\",\\"trailer_number\\":\\"$trailerNumber\\",\\"mileage_in\\":\\"$mileageIn\\",\\"mileage_out\\":\\"$mileageOut\\",\\"date_check_in\\":\\"$dateCheckIn\\",\\"date_check_out\\":\\"$dateCheckOut\\",\\"def_level\\":{\\"ids\\":[$defLevel]},\\"fuel_level\\":{\\"ids\\":[$fuelLevel]}, \\"chains\\":\\"$chains\\", \\"scraps\\":\\"$scraps\\", \\"inverter\\":\\"$inverter\\", \\"gps_for_truck\\":\\"$gpsForTruck\\", \\"gps_for_trailer\\":\\"$gpsForTrailer\\", \\"fridge\\":\\"$fridge\\"}"}}''';
+      request.body = '''{"query":"mutation (\$columnValuesJson: JSON!) {\\n  create_item(\\n    board_id: $myBoard\\n    group_id: \\"topics\\"\\n    item_name: \\"$itemName\\"\\n    column_values: \$columnValuesJson\\n  ) {\\n    id\\n  }\\n}","variables":{"columnValuesJson":"{\\"driver_name\\":\\"$driverName\\",\\"truck_vin\\":\\"$truckVin\\",\\"trailer_number\\":\\"$trailerNumber\\",\\"mileage_in\\":\\"$mileageIn\\",\\"mileage_out\\":\\"$mileageOut\\",\\"date_check_in\\":\\"$dateCheckIn\\",\\"def_level\\":{\\"ids\\":[$defLevel]},\\"fuel_level\\":{\\"ids\\":[$fuelLevel]}, \\"chains\\":\\"$chains\\", \\"scraps\\":\\"$scraps\\", \\"inverter\\":\\"$inverter\\", \\"gps_for_truck\\":\\"$gpsForTruck\\", \\"gps_for_trailer\\":\\"$gpsForTrailer\\", \\"fridge\\":\\"$fridge\\"}"}}''';
 
       request.headers.addAll(headers);
 
@@ -376,19 +375,18 @@ class MainFormService {
           build: (context) => [
             pw.Header(
               level: 0,
-              child: pw.Text('Vehicle Inspection Report: ${mainFormModel.itemName}', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+              child: pw.Text('Vehicle Inspection Report: ${itemNameOptions[mainFormModel.itemName]!}', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
             ),
             pw.Text('Driver Name: ${mainFormModel.driverName}', style: const pw.TextStyle(fontSize: 14)),
             pw.Text('Truck VIN: ${mainFormModel.truckVin}', style: const pw.TextStyle(fontSize: 14)),
             pw.Text('Trailer Number: ${mainFormModel.trailerNumber}', style: const pw.TextStyle(fontSize: 14)),
-            pw.Text('Check-In Date: ${_formatDate(mainFormModel.dateCheckIn!)}', style: const pw.TextStyle(fontSize: 14)),
-            pw.Text('Check-Out Date: ${_formatDate(mainFormModel.dateCheckOut!)}', style: const pw.TextStyle(fontSize: 14)),
+            pw.Text('Date: ${mainFormModel.dateCheckIn != null ? _formatDate(mainFormModel.dateCheckIn!) : " "}', style: const pw.TextStyle(fontSize: 14)),
             pw.Text('Mileage In: ${mainFormModel.mileageIn}', style: const pw.TextStyle(fontSize: 14)),
             pw.Text('Mileage Out: ${mainFormModel.mileageOut}', style: const pw.TextStyle(fontSize: 14)),
             pw.Text('DEF Level: ${defLevelMap[mainFormModel.defLevel!]}', style: const pw.TextStyle(fontSize: 14)),
             pw.Text('Fuel Level: ${fuelLevelMap[mainFormModel.fuelLevel!]}', style: const pw.TextStyle(fontSize: 14)),
             pw.Text('Chains: ${mainFormModel.chains}', style: const pw.TextStyle(fontSize: 14)),
-            pw.Text('Scraps: ${mainFormModel.scraps}', style: const pw.TextStyle(fontSize: 14)),
+            pw.Text('Straps: ${mainFormModel.scraps}', style: const pw.TextStyle(fontSize: 14)),
             pw.Text('Inverter: ${options[mainFormModel.inverter]}', style: const pw.TextStyle(fontSize: 14)),
             pw.Text('GPS for Truck: ${options[mainFormModel.gpsForTruck]}', style: const pw.TextStyle(fontSize: 14)),
             pw.Text('GPS for Trailer: ${options[mainFormModel.gpsForTrailer]}', style: const pw.TextStyle(fontSize: 14)),

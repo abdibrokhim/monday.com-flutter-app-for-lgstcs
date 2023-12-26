@@ -354,6 +354,21 @@ MainFormState updateScrapsReducer(
 
 
 
+// ========== UpdateItemName Actions ========== //
+
+class UpdateItemName {
+  final int itemName;
+  UpdateItemName(this.itemName);
+}
+
+MainFormState updateItemNameReducer(
+    MainFormState state, UpdateItemName action) {
+  return state.copyWith(
+    mainFormModel: state.mainFormModel?.copyWith(itemName: action.itemName),
+  );
+}
+
+
 // ========== defLevelMap Actions ========== //
 
 class UpdateDefLevelMap {
@@ -1279,5 +1294,7 @@ Reducer<MainFormState> mainFormReducer = combineReducers<MainFormState>([
   TypedReducer<MainFormState, UpdateSettingsAction>(updateSettingsActionReducer).call,
   TypedReducer<MainFormState, ClearAllGenericMsgAction>(clearAllGenericMsgReducer).call,
   TypedReducer<MainFormState, ClearAllGenericMsgSuccessAction>(clearAllGenericMsgSuccessReducer).call,
+  TypedReducer<MainFormState, ClearAllGenericErrorSuccessAction>(clearAllGenericErrorSuccessReducer).call,
+  TypedReducer<MainFormState, UpdateItemName>(updateItemNameReducer).call,
 ]);
 

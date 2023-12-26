@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 class MainFormModel {
-  final String itemName;
+  final int? itemName;
   final String driverName;
   final String truckVin;
   final String trailerNumber;
@@ -39,7 +39,7 @@ class MainFormModel {
   final int? fridge;
 
   MainFormModel({
-    this.itemName = '',
+    this.itemName,
     this.driverName = '',
     this.truckVin = '',
     this.trailerNumber = '',
@@ -77,7 +77,7 @@ class MainFormModel {
 
   factory MainFormModel.initial() {
     return MainFormModel(
-      itemName: '',
+      itemName: null,
       driverName: '',
       truckVin: '',
       trailerNumber: '',
@@ -114,7 +114,7 @@ class MainFormModel {
   }
 
   MainFormModel copyWith({
-    String? itemName,
+    int? itemName,
     String? driverName,
     String? truckVin,
     String? trailerNumber,
@@ -246,6 +246,12 @@ const Map<int, String> fuelLevelMap = {
 const Map<int, String> options = {
   0: 'No',
   1: 'Yes',
+};
+
+const Map<int, String> itemNameOptions = {
+  0: 'Check in',
+  1: 'Check out',
+  2: 'Inspection',
 };
 
 class ReportForm {
