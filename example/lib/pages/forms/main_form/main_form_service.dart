@@ -52,8 +52,8 @@ class MainFormService {
       String gpsForTruck = options[mainFormModel.gpsForTruck]!; 
       String gpsForTrailer = options[mainFormModel.gpsForTrailer]!;
       String fridge = options[mainFormModel.fridge]!;
-      int defLevel = mainFormModel.defLevel!+1;
-      int fuelLevel = mainFormModel.fuelLevel!+1;
+      String defLevel = defLevelMap[mainFormModel.defLevel!+1]!;
+      String fuelLevel = fuelLevelMap[mainFormModel.fuelLevel!+1]!;
       String dateCheckIn = mainFormModel.dateCheckIn != null ? mainFormModel.dateCheckIn!.toIso8601String().substring(0, 10) : '';
 
       var headers = {
@@ -61,7 +61,7 @@ class MainFormService {
         'Content-Type': 'application/json'
       };
       var request = http.Request('POST', Uri.parse(backendServiceBaseUrl));
-      request.body = '''{"query":"mutation (\$columnValuesJson: JSON!) {\\n  create_item(\\n    board_id: $myBoard\\n    group_id: \\"topics\\"\\n    item_name: \\"$itemName\\"\\n    column_values: \$columnValuesJson\\n  ) {\\n    id\\n  }\\n}","variables":{"columnValuesJson":"{\\"driver_name\\":\\"$driverName\\",\\"truck_vin\\":\\"$truckVin\\",\\"trailer_number\\":\\"$trailerNumber\\",\\"mileage_in\\":\\"$mileageIn\\",\\"mileage_out\\":\\"$mileageOut\\",\\"date_check_in\\":\\"$dateCheckIn\\",\\"def_level\\":{\\"ids\\":[$defLevel]},\\"fuel_level\\":{\\"ids\\":[$fuelLevel]}, \\"chains\\":\\"$chains\\", \\"scraps\\":\\"$scraps\\", \\"inverter\\":\\"$inverter\\", \\"gps_for_truck\\":\\"$gpsForTruck\\", \\"gps_for_trailer\\":\\"$gpsForTrailer\\", \\"fridge\\":\\"$fridge\\"}"}}''';
+      request.body = '''{"query":"mutation (\$columnValuesJson: JSON!) {\\n  create_item(\\n    board_id: $myBoard\\n    group_id: \\"topics\\"\\n    item_name: \\"$itemName\\"\\n    column_values: \$columnValuesJson\\n  ) {\\n    id\\n  }\\n}","variables":{"columnValuesJson":"{\\"driver_name\\":\\"$driverName\\",\\"truck_vin\\":\\"$truckVin\\",\\"trailer_number\\":\\"$trailerNumber\\",\\"mileage_in\\":\\"$mileageIn\\",\\"mileage_out\\":\\"$mileageOut\\",\\"date_check_in\\":\\"$dateCheckIn\\",\\"def_level1\\":\\"$defLevel\\",\\"fuel_level1\\":\\"$fuelLevel\\", \\"chains\\":\\"$chains\\", \\"scraps\\":\\"$scraps\\", \\"inverter\\":\\"$inverter\\", \\"gps_for_truck\\":\\"$gpsForTruck\\", \\"gps_for_trailer\\":\\"$gpsForTrailer\\", \\"fridge\\":\\"$fridge\\"}"}}''';
 
       request.headers.addAll(headers);
 
