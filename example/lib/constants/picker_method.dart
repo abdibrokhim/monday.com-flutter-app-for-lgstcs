@@ -5,7 +5,10 @@ import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 Future<AssetEntity?> _pickFromCamera(BuildContext c) {
   return CameraPicker.pickFromCamera(
     c,
-    pickerConfig: const CameraPickerConfig(enableRecording: true),
+    pickerConfig: const CameraPickerConfig(
+      enableRecording: true,
+      textDelegate: CameraPickerTextDelegate() 
+    ),
   );
 }
 
@@ -30,6 +33,7 @@ class PickMethod {
           pickerConfig: AssetPickerConfig(
             maxAssets: maxAssetsCount,
             selectedAssets: assets,
+            textDelegate: const EnglishAssetPickerTextDelegate() 
           ),
         );
       },
@@ -67,6 +71,7 @@ class PickMethod {
             maxAssets: maxAssetsCount,
             selectedAssets: assets,
             requestType: RequestType.video,
+            textDelegate: const EnglishAssetPickerTextDelegate() 
           ),
         );
       },
@@ -85,6 +90,7 @@ class PickMethod {
             maxAssets: maxAssetsCount,
             selectedAssets: assets,
             requestType: RequestType.audio,
+            textDelegate: const EnglishAssetPickerTextDelegate() 
           ),
         );
       },
@@ -101,7 +107,7 @@ class PickMethod {
       name: 'Camera Picker',
       description: 'Pick assets with camera picker.',
       method: (BuildContext context, List<AssetEntity> assets) {
-        const AssetPickerTextDelegate textDelegate = AssetPickerTextDelegate();
+        const EnglishAssetPickerTextDelegate textDelegate = EnglishAssetPickerTextDelegate();
         return AssetPicker.pickAssets(
           context,
           pickerConfig: AssetPickerConfig(
@@ -148,7 +154,7 @@ class PickMethod {
       name: 'Camera Picker And Stay',
       description: 'Pick assets with camera picker and stay in picker.',
       method: (BuildContext context, List<AssetEntity> assets) {
-        const AssetPickerTextDelegate textDelegate = AssetPickerTextDelegate();
+        const EnglishAssetPickerTextDelegate textDelegate = EnglishAssetPickerTextDelegate();
         return AssetPicker.pickAssets(
           context,
           pickerConfig: AssetPickerConfig(

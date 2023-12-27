@@ -16,6 +16,8 @@ class MainFormState {
   final bool isActiveFleetItemsListLoading;
   final bool isSubmittedSuccessfully;
   final bool isReportSubmittedSuccessfully;
+  final bool showPopUpMainForm;
+  final bool showPopUpReportForm;
   final bool isProcessing;
   final bool isGeneratingReport;
   final bool isClearing;
@@ -44,6 +46,8 @@ class MainFormState {
     this.isActiveFleetVINsListLoading = false,
     this.isSubmittedSuccessfully = false,
     this.isReportSubmittedSuccessfully = false,
+    this.showPopUpMainForm = false,
+    this.showPopUpReportForm = false,
     this.isGeneratingReport = false,
     this.isActiveFleetItemsListLoading = false,
     this.isProcessing = false,
@@ -76,6 +80,8 @@ class MainFormState {
       isActiveFleetItemsListLoading: false,
       isSubmittedSuccessfully: false,
       isReportSubmittedSuccessfully: false,
+      showPopUpMainForm: false,
+      showPopUpReportForm: false,
       isGeneratingReport: false,
       isProcessing: false,
       isClearing: false,
@@ -107,6 +113,8 @@ class MainFormState {
     bool? isActiveFleetItemsListLoading,
     bool? isSubmittedSuccessfully,
     bool? isReportSubmittedSuccessfully,
+    bool? showPopUpMainForm,
+    bool? showPopUpReportForm,
     bool? isGeneratingReport,
     bool? isProcessing,
     bool? isClearing,
@@ -137,6 +145,8 @@ class MainFormState {
       isActiveFleetItemsListLoading: isActiveFleetItemsListLoading ?? this.isActiveFleetItemsListLoading,
       isSubmittedSuccessfully: isSubmittedSuccessfully ?? this.isSubmittedSuccessfully,
       isReportSubmittedSuccessfully: isReportSubmittedSuccessfully ?? this.isReportSubmittedSuccessfully,
+      showPopUpMainForm: showPopUpMainForm ?? this.showPopUpMainForm,
+      showPopUpReportForm: showPopUpReportForm ?? this.showPopUpReportForm,
       isGeneratingReport: isGeneratingReport ?? this.isGeneratingReport,
       isProcessing: isProcessing ?? this.isProcessing,
       isClearing: isClearing ?? this.isClearing,
@@ -159,6 +169,64 @@ class MainFormState {
     );
   }
 }
+
+
+// ========== show pop up Main Form Actions ========== //
+
+class ShowPopUpMainFormAction {
+  ShowPopUpMainFormAction();
+}
+
+MainFormState showPopUpMainFormReducer(
+    MainFormState state, ShowPopUpMainFormAction action) {
+  return state.copyWith(
+    showPopUpMainForm: true,
+  );
+}
+
+
+// ========== hide pop up Main Form Actions ========== //
+
+class HidePopUpMainFormAction {
+  HidePopUpMainFormAction();
+}
+
+MainFormState hidePopUpMainFormReducer(
+    MainFormState state, HidePopUpMainFormAction action) {
+  return state.copyWith(
+    showPopUpMainForm: false,
+  );
+}
+
+
+// ========== show pop up Report Form Actions ========== //
+
+class ShowPopUpReportFormAction {
+  ShowPopUpReportFormAction();
+}
+
+
+MainFormState showPopUpReportFormReducer(
+    MainFormState state, ShowPopUpReportFormAction action) {
+  return state.copyWith(
+    showPopUpReportForm: true,
+  );
+}
+
+
+// ========== hide pop up Report Form Actions ========== //
+
+class HidePopUpReportFormAction {
+  HidePopUpReportFormAction();
+}
+
+MainFormState hidePopUpReportFormReducer(
+    MainFormState state, HidePopUpReportFormAction action) {
+  return state.copyWith(
+    showPopUpReportForm: false,
+  );
+}
+
 
 
 // ========== ReinitializeFormAction Actions ========== //
@@ -1097,6 +1165,7 @@ MainFormState submitMainFormSuccessActionReducer(
     isProcessing: false,
     errors: Map<int, String>.from({}),
     itemId: action.itemId,
+    showPopUpMainForm: true,
   );
 }
 
@@ -1129,9 +1198,11 @@ MainFormState submitReportActionSuccessActionReducer(
     MainFormState state, SubmitReportActionSuccessAction action) {
   return state.copyWith(
     isReportSubmittedSuccessfully: true,
+    isSubmittedSuccessfully: false,
     isProcessing: false,
     errors: Map<int, String>.from({}),
     responseMessage: action.message,
+    showPopUpReportForm: true,
   );
 }
 
@@ -1296,5 +1367,9 @@ Reducer<MainFormState> mainFormReducer = combineReducers<MainFormState>([
   TypedReducer<MainFormState, ClearAllGenericMsgSuccessAction>(clearAllGenericMsgSuccessReducer).call,
   TypedReducer<MainFormState, ClearAllGenericErrorSuccessAction>(clearAllGenericErrorSuccessReducer).call,
   TypedReducer<MainFormState, UpdateItemName>(updateItemNameReducer).call,
+  TypedReducer<MainFormState, HidePopUpReportFormAction>(hidePopUpReportFormReducer).call,
+  TypedReducer<MainFormState, ShowPopUpReportFormAction>(showPopUpReportFormReducer).call,
+  TypedReducer<MainFormState, HidePopUpMainFormAction>(hidePopUpMainFormReducer).call,
+  TypedReducer<MainFormState, ShowPopUpMainFormAction>(showPopUpMainFormReducer).call,
 ]);
 

@@ -16,6 +16,8 @@ import 'package:mainform/pages/forms/main_form/main_form_reducer.dart';
 import 'package:mainform/store/app_logs.dart';
 import 'package:mainform/store/app_store.dart';
 import 'package:mainform/widgets/selected_assets_list_view.dart';
+import 'package:intl/intl.dart';
+
 
 
 class MyPage extends StatefulWidget {
@@ -189,14 +191,129 @@ class _MyPageState extends State<MyPage>
     }
 
 
+  void _popUpMessage(BuildContext context, String message, IconData icon, Color color, String sKey) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: SizedBox(
+            width: 300,
+            height: 250,
+            child:Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: 
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, color: color, size: 50,),
+                const SizedBox(height: 20),
+                Text(message),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    if (sKey == "mainForm") {
+store.dispatch(HidePopUpMainFormAction());
+                    } else if (sKey == "reportForm") {
+store.dispatch(HidePopUpReportFormAction());
+                    }
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showDeveloperLogs(BuildContext context) {
+  var mainFormState = StoreProvider.of<GlobalState>(context).state.appState.mainFormState;
+
+  String _formatTimestamp(DateTime dateTime) {
+    return DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime);
+  }
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return Dialog(
+        child: SizedBox(
+          width: 400,
+          height: 600,
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                    
+                  const Text('Logs', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+ TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Icon(Icons.close),
+                  ),
+                  ],),
+                  const SizedBox(height: 20),
+                  
+                  if (mainFormState.isSubmittedSuccessfully) 
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4.0),
+                      child: Text('${_formatTimestamp(DateTime.now())} - Form submitted successfully itemId: ${mainFormState.itemId ?? 'Could not find the item id.'}',),
+                    ),
+                  if (mainFormState.isReportSubmittedSuccessfully) 
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4.0),
+                      child: Text('${_formatTimestamp(DateTime.now())} - Report submitted successfully file ref: ${mainFormState.responseMessage ?? 'Could not find the file ref.'}',),
+                    ),
+                    if (mainFormState.reportPath!.isNotEmpty) 
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4.0),
+                              child: Text('${_formatTimestamp(DateTime.now())} - ${mainFormState.reportPath ?? 'Report was generated successfully. We could not find the path to the report. Check your folders.'}'), 
+                              ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
+
+
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('MAIN FORM'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              _showDeveloperLogs(context);
+            },
+            icon: const Icon(Icons.settings),
+          ),
+        ],
       ),
       body: StoreConnector<GlobalState, MainFormState>(
+        onDidChange: (prev, next) {
+          if (next.isSubmittedSuccessfully && !next.isReportSubmittedSuccessfully && next.showPopUpMainForm) {
+            _popUpMessage(context, 'Form submitted successfully itemId: ${next.itemId ?? 'Could not find the item id.'}', Icons.check_circle, Colors.green, "mainForm");
+          }
+          if (next.isReportSubmittedSuccessfully && next.showPopUpReportForm) {
+            _popUpMessage(context, 'Report submitted successfully file ref: ${next.responseMessage ?? 'Could not find the file ref.'}', Icons.check_circle, Colors.green, "reportForm");
+          }
+        },
       converter: (appState) => appState.state.appState.mainFormState,
       onInit: (store) => {
         store.dispatch(ClearAllGenericErrorAction()),
@@ -263,12 +380,6 @@ class _MyPageState extends State<MyPage>
                             ),
                           ],
                         ),
-                      if (mainFormState.isSubmittedSuccessfully) Padding(padding: const EdgeInsets.only(left:16.0, right:16.0),
-                              child: Text('Form submitted successfully itemId: ${mainFormState.itemId ?? 'Could not find the item id.'}'),),
-                      if (mainFormState.isReportSubmittedSuccessfully) Padding(padding: const EdgeInsets.only(left:16.0, right:16.0),
-                              child: Text('Report submitted successfully file ref: ${mainFormState.responseMessage ?? 'Could not find the file ref.'}'),),
-                      if (mainFormState.reportPath!.isNotEmpty) Padding(padding: const EdgeInsets.only(left:16.0, right:16.0),
-                              child: Text(mainFormState.reportPath ?? 'Report was generated successfully. We could not find the path to the report. Check your folders.'), ),
                       if (mainFormState.errors != null && mainFormState.errors!.isNotEmpty)
                         Column(
                           children: [
